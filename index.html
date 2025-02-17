@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Búsqueda de Películas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Buscador de Películas</h1>
+  <div id="movie-list"></div>
+
+  <!-- Ventana modal -->
+  <div id="info-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3 id="info-movie-title"></h3>
+      <img id="info-poster" alt="Poster de la película" style="max-width: 100%; height: auto;">
+      <p><strong>Sinopsis:</strong> <span id="info-overview"></span></p>
+      <p><strong>Fecha de estreno:</strong> <span id="info-release-date"></span></p>
+      <p><strong>Géneros:</strong> <span id="info-genres"></span></p>
+      <p><strong>Duración:</strong> <span id="info-runtime"></span> minutos</p>
+      <p><strong>Popularidad:</strong> <span id="info-popularity"></span></p>
+      <p><strong>Idioma original:</strong> <span id="info-original-language"></span></p>
+      <div id="modal-movie-player"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
