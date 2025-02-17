@@ -3,16 +3,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Proyecto</title>
-  <link rel="stylesheet" href="assets/css/styles.css">
+  <title>Mi Películas Online</title>
+  <style>
+    /* Estilos generales */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #141414;
+      color: #fff;
+    }
+    header {
+      background-color: #000;
+      padding: 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .container {
+      padding: 20px;
+    }
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+    }
+    .movie-item {
+      position: relative;
+      cursor: pointer;
+    }
+    .movie-item img {
+      width: 100%;
+      height: auto;
+      border-radius: 5px;
+    }
+    .movie-item:hover::after {
+      content: "▶ Ver ahora";
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      padding: 5px 10px;
+      border-radius: 3px;
+      font-size: 14px;
+    }
+    .video-container {
+      margin-top: 20px;
+      text-align: center;
+    }
+    iframe {
+      width: 100%;
+      max-width: 800px;
+      height: 450px;
+      border: none;
+    }
+  </style>
 </head>
 <body>
   <header>
-    <h1>Bienvenido a Mi Proyecto</h1>
+    <h1>Mi Películas Online</h1>
   </header>
-  <main>
-    <div id="movie-list"></div>
-  </main>
-  <script src="assets/js/script.js"></script>
+  <div class="container">
+    <div class="movie-grid" id="movieGrid"></div>
+    <div class="video-container">
+      <iframe id="videoFrame" src="" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <script>
+    // Simulación de datos protegidos (en un entorno real, obtén esto desde un backend)
+    const movies = [
+      { title: "The Marvels (2023)", poster: "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/vpuuFM032yiX8tox4L84Wl9MGjG.jpg", url: "https://short.icu/JjhXT9b-n" },
+      { title: "El Exorcista Creyentes (2023)", poster: "https://example.com/posters/exorcista.jpg", url: "https://short.icu/GZg9k7T4i" },
+      { title: "Cónclave (2024)", poster: "https://example.com/posters/conclave.jpg", url: "https://short.icu/F4FjMB_vv" },
+      { title: "Kraven the Hunter (2024)", poster: "https://example.com/posters/kraven.jpg", url: "https://short.icu/XdKaWzYnhp" }
+    ];
+
+    // Mostrar la lista de películas
+    const movieGrid = document.getElementById("movieGrid");
+    const videoFrame = document.getElementById("videoFrame");
+
+    movies.forEach(movie => {
+      const movieItem = document.createElement("div");
+      movieItem.classList.add("movie-item");
+
+      const img = document.createElement("img");
+      img.src = movie.poster;
+      img.alt = movie.title;
+
+      movieItem.appendChild(img);
+      movieItem.onclick = () => loadVideo(movie.url);
+      movieGrid.appendChild(movieItem);
+    });
+
+    // Cargar el video seleccionado en el iframe
+    function loadVideo(url) {
+      videoFrame.src = url;
+    }
+  </script>
 </body>
 </html>
