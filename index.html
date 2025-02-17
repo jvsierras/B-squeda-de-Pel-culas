@@ -33,32 +33,67 @@
     .movie-item {
       position: relative;
       cursor: pointer;
+      border-radius: 5px;
+      overflow: hidden;
+      background-color: #222;
+      padding: 10px;
     }
     .movie-item img {
       width: 100%;
       height: auto;
       border-radius: 5px;
     }
-    .movie-item:hover::after {
-      content: "▶ Ver ahora";
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background: rgba(0, 0, 0, 0.7);
-      color: #fff;
-      padding: 5px 10px;
-      border-radius: 3px;
+    .movie-info {
+      margin-top: 10px;
+    }
+    .movie-info h3 {
+      font-size: 16px;
+      margin: 0 0 5px;
+    }
+    .movie-info p {
+      font-size: 12px;
+      margin: 0 0 5px;
+    }
+    .movie-info a {
+      display: inline-block;
+      margin-right: 10px;
+      color: #D04721;
+      text-decoration: none;
       font-size: 14px;
     }
-    .video-container {
-      margin-top: 20px;
-      text-align: center;
-    }
-    iframe {
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
       width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+    }
+    .modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
       max-width: 800px;
+      background-color: #000;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .modal-content iframe {
+      width: 100%;
       height: 450px;
       border: none;
+    }
+    .close-modal {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -68,7 +103,12 @@
   </header>
   <div class="container">
     <div class="movie-grid" id="movieGrid"></div>
-    <div class="video-container">
+  </div>
+
+  <!-- Modal para el reproductor -->
+  <div id="videoModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
       <iframe id="videoFrame" src="" allowfullscreen></iframe>
     </div>
   </div>
@@ -76,15 +116,35 @@
   <script>
     // Simulación de datos protegidos (en un entorno real, obtén esto desde un backend)
     const movies = [
-      { title: "The Marvels (2023)", poster: "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/vpuuFM032yiX8tox4L84Wl9MGjG.jpg", url: "https://short.icu/JjhXT9b-n" },
-      { title: "El Exorcista Creyentes (2023)", poster: "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/6StdSKn9ej4rwtQjcl1XMk5E0iE.jpg", url: "https://short.icu/GZg9k7T4i" },
-      { title: "Cónclave (2024)", poster: "https://example.com/posters/conclave.jpg", url: "https://short.icu/F4FjMB_vv" },
-      { title: "Kraven the Hunter (2024)", poster: "https://example.com/posters/kraven.jpg", url: "https://short.icu/XdKaWzYnhp" }
+      {
+        title: "The Marvels (2023)",
+        poster: "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/vpuuFM032yiX8tox4L84Wl9MGjG.jpg",
+        description: "Una emocionante aventura de superhéroes.",
+        year: 2023,
+        genre: "Acción/Aventura",
+        options: [
+          { label: "Opción 1", url: "https://short.icu/JjhXT9b-n" },
+          { label: "Opción 2", url: "https://vidsrc.me/embed/movie?tmdb=609681" }
+        ]
+      },
+      {
+        title: "El Exorcista Creyentes (2023)",
+        poster: "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/6StdSKn9ej4rwtQjcl1XMk5E0iE.jpg",
+        description: "Un clásico del terror renovado. Cuando sus dos hijas son poseídas por un espíritu demoníaco, un padre desesperado busca la ayuda de Chris MacNeil, cuya hija Regan sobrevivió a una posesión similar en la década de 1970.",
+        year: 2023,
+        genre: "Terror",
+        options: [
+          { label: "Opción 1", url: "https://short.icu/GZg9k7T4i" },
+          { label: "Opción 2", url: "https://vidsrc.me/embed/movie?tmdb=807172" }
+        ]
+      }
     ];
 
     // Mostrar la lista de películas
     const movieGrid = document.getElementById("movieGrid");
+    const videoModal = document.getElementById("videoModal");
     const videoFrame = document.getElementById("videoFrame");
+    const closeModal = document.querySelector(".close-modal");
 
     movies.forEach(movie => {
       const movieItem = document.createElement("div");
@@ -94,15 +154,60 @@
       img.src = movie.poster;
       img.alt = movie.title;
 
+      const info = document.createElement("div");
+      info.classList.add("movie-info");
+
+      const title = document.createElement("h3");
+      title.textContent = movie.title;
+
+      const description = document.createElement("p");
+      description.textContent = movie.description;
+
+      const yearGenre = document.createElement("p");
+      yearGenre.textContent = `${movie.year} | ${movie.genre}`;
+
+      const options = document.createElement("div");
+
+      movie.options.forEach(option => {
+        const link = document.createElement("a");
+        link.textContent = option.label;
+        link.href = "#";
+        link.onclick = (e) => {
+          e.preventDefault();
+          openVideoModal(option.url);
+        };
+        options.appendChild(link);
+      });
+
+      info.appendChild(title);
+      info.appendChild(description);
+      info.appendChild(yearGenre);
+      info.appendChild(options);
+
       movieItem.appendChild(img);
-      movieItem.onclick = () => loadVideo(movie.url);
+      movieItem.appendChild(info);
       movieGrid.appendChild(movieItem);
     });
 
-    // Cargar el video seleccionado en el iframe
-    function loadVideo(url) {
+    // Abrir el modal con el video seleccionado
+    function openVideoModal(url) {
       videoFrame.src = url;
+      videoModal.style.display = "block";
     }
+
+    // Cerrar el modal
+    closeModal.onclick = () => {
+      videoModal.style.display = "none";
+      videoFrame.src = "";
+    };
+
+    // Cerrar el modal al hacer clic fuera del contenido
+    window.onclick = (event) => {
+      if (event.target === videoModal) {
+        videoModal.style.display = "none";
+        videoFrame.src = "";
+      }
+    };
   </script>
 </body>
 </html>
