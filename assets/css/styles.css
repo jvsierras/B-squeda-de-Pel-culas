@@ -1,1 +1,35 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
 
+header {
+  background-color: #2196f3;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+}
+
+#movie-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.movie-item {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  width: 200px;
+  text-align: center;
+}
+
+.movie-item img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
