@@ -1,0 +1,7 @@
+{
+  "items": [
+    { "name": "Película 1", "slug": "slug1" },
+    { "name": "Película 2", "slug": "slug2" },
+    { "name": "Película 3", "slug": "slug3" }
+  ]
+}
