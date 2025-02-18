@@ -1,6 +1,26 @@
 {
   "items": [
     {
+    "title": "The Marvels (2023)",
+    "poster": "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/vpuuFM032yiX8tox4L84Wl9MGjG.jpg",
+    "description": "Una emocionante aventura de superhéroes.",
+    "year": 2023,
+    "genre": "Acción/Aventura",
+    "options": [
+      { "label": "Opción 1", "url": "https://short.icu/JjhXT9b-n" },
+      { "label": "Opción 2", "url": "https://short.icu/XYZ123" }
+    ]
+  },
+  {
+    "title": "El Exorcista Creyentes (2023)",
+    "poster": "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/6StdSKn9ej4rwtQjcl1XMk5E0iE.jpg",
+    "description": "Un clásico del terror renovado.",
+    "year": 2023,
+    "genre": "Terror",
+    "options": [
+      { "label": "Opción 1", "url": "https://short.icu/GZg9k7T4i" },
+      { "label": "Opción 2", "url": "https://short.icu/ABC456" },
+    {
       "name": "spider-man the animated series",
       "slug": "7mKwvWo2Z",
       "resolution": "NaN",
