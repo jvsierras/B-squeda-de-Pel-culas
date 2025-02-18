@@ -1,199 +1,67 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mi Películas Online</title>
+  <title>Lista de Películas</title>
   <style>
-    /* Estilos generales */
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #141414;
-      color: #fff;
+      margin: 20px;
     }
-    header {
-      background-color: #000;
-      padding: 20px;
-      text-align: center;
+    .video-container {
+      margin-bottom: 20px;
     }
-    header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
-    .container {
-      padding: 20px;
-    }
-    .movie-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 15px;
-    }
-    .movie-item {
-      position: relative;
-      cursor: pointer;
-      border-radius: 5px;
-      overflow: hidden;
-      background-color: #222;
-      padding: 10px;
-    }
-    .movie-item img {
+    iframe {
       width: 100%;
-      height: auto;
-      border-radius: 5px;
-    }
-    .movie-info {
-      margin-top: 10px;
-    }
-    .movie-info h3 {
-      font-size: 16px;
-      margin: 0 0 5px;
-    }
-    .movie-info p {
-      font-size: 12px;
-      margin: 0 0 5px;
-    }
-    .movie-info a {
-      display: inline-block;
-      margin-right: 10px;
-      color: #D04721;
-      text-decoration: none;
-      font-size: 14px;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
-    }
-    .modal-content {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 80%;
       max-width: 800px;
-      background-color: #000;
-      padding: 20px;
-      border-radius: 10px;
-    }
-    .modal-content iframe {
-      width: 100%;
       height: 450px;
       border: none;
     }
-    .close-modal {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      color: #fff;
-      font-size: 24px;
+    .video-list {
+      list-style: none;
+      padding: 0;
+    }
+    .video-list li {
+      margin: 10px 0;
       cursor: pointer;
+      color: blue;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Mi Películas Online</h1>
-  </header>
-  <div class="container">
-    <div class="movie-grid" id="movieGrid"></div>
-  </div>
-
-  <!-- Modal para el reproductor -->
-  <div id="videoModal" class="modal">
-    <div class="modal-content">
-      <span class="close-modal">&times;</span>
-      <iframe id="videoFrame" src="" allowfullscreen></iframe>
-    </div>
+  <h1>Lista de Películas</h1>
+  <ul class="video-list" id="videoList"></ul>
+  <div class="video-container">
+    <iframe id="videoFrame" src="" allowfullscreen></iframe>
   </div>
 
   <script>
-    // Función para cargar datos desde el archivo JSON
-    async function loadMovies() {
-      try {
-        const response = await fetch('movies.json'); // Cargar el archivo JSON
-        const movies = await response.json(); // Convertir la respuesta a JSON
+    // Simulación de datos protegidos (en un entorno real, obtén esto desde un backend)
+    const videos = [
+      { title: "The Marvels (2023)", url: "https://short.icu/JjhXT9b-n" },
+      { title: "El Exorcista Creyentes (2023)", url: "https://short.icu/GZg9k7T4i" },
+      { title: "Cónclave (2024)", url: "https://short.icu/F4FjMB_vv" },
+      { title: "Kraven the Hunter (2024)", url: "https://short.icu/XdKaWzYnhp" },
+      { title: "Misión: Imposible - Sentencia Mortal (2023)", url: "https://short.icu/nGCnmitAr" }
+    ];
 
-        const movieGrid = document.getElementById("movieGrid");
-        const videoModal = document.getElementById("videoModal");
-        const videoFrame = document.getElementById("videoFrame");
-        const closeModal = document.querySelector(".close-modal");
+    // Mostrar la lista de videos
+    const videoList = document.getElementById("videoList");
+    const videoFrame = document.getElementById("videoFrame");
 
-        movies.forEach(movie => {
-          const movieItem = document.createElement("div");
-          movieItem.classList.add("movie-item");
+    videos.forEach((video) => {
+      const listItem = document.createElement("li");
+      listItem.textContent = video.title;
+      listItem.onclick = () => loadVideo(video.url);
+      videoList.appendChild(listItem);
+    });
 
-          const img = document.createElement("img");
-          img.src = movie.poster;
-          img.alt = movie.title;
-
-          const info = document.createElement("div");
-          info.classList.add("movie-info");
-
-          const title = document.createElement("h3");
-          title.textContent = movie.title;
-
-          const description = document.createElement("p");
-          description.textContent = movie.description;
-
-          const yearGenre = document.createElement("p");
-          yearGenre.textContent = `${movie.year} | ${movie.genre}`;
-
-          const options = document.createElement("div");
-
-          movie.options.forEach(option => {
-            const link = document.createElement("a");
-            link.textContent = option.label;
-            link.href = "#";
-            link.onclick = (e) => {
-              e.preventDefault();
-              openVideoModal(option.url);
-            };
-            options.appendChild(link);
-          });
-
-          info.appendChild(title);
-          info.appendChild(description);
-          info.appendChild(yearGenre);
-          info.appendChild(options);
-
-          movieItem.appendChild(img);
-          movieItem.appendChild(info);
-          movieGrid.appendChild(movieItem);
-        });
-
-        // Abrir el modal con el video seleccionado
-        function openVideoModal(url) {
-          videoFrame.src = url;
-          videoModal.style.display = "block";
-        }
-
-        // Cerrar el modal
-        closeModal.onclick = () => {
-          videoModal.style.display = "none";
-          videoFrame.src = "";
-        };
-
-        // Cerrar el modal al hacer clic fuera del contenido
-        window.onclick = (event) => {
-          if (event.target === videoModal) {
-            videoModal.style.display = "none";
-            videoFrame.src = "";
-          }
-        };
-      } catch (error) {
-        console.error('Error al cargar las películas:', error);
-      }
+    // Cargar el video seleccionado en el iframe
+    function loadVideo(url) {
+      videoFrame.src = url;
     }
-
-    // Llamar a la función para cargar las películas cuando se carga la página
-    document.addEventListener("DOMContentLoaded", loadMovies);
   </script>
 </body>
 </html>
