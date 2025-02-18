@@ -8,220 +8,62 @@
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
-      background-color: #f4f4f4;
     }
-    h1 {
-      text-align: center;
-      color: #333;
+    .video-container {
+      margin-bottom: 20px;
     }
-    .movie-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-    }
-    .movie-card {
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      width: 250px;
-      overflow: hidden;
-      transition: transform 0.3s ease;
-    }
-    .movie-card:hover {
-      transform: scale(1.05);
-    }
-    .movie-card img {
+    iframe {
       width: 100%;
-      height: auto;
-      object-fit: cover;
-    }
-    .movie-info {
-      padding: 15px;
-    }
-    .movie-title {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #333;
-    }
-    .movie-details {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 10px;
-    }
-    .movie-actions {
-      display: flex;
-      gap: 10px;
-    }
-    .movie-actions button {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background-color 0.3s ease;
-    }
-    .movie-actions button.watch-iframe {
-      background-color: #007bff;
-      color: #fff;
-    }
-    .movie-actions button.watch-modal {
-      background-color: #28a745;
-      color: #fff;
-    }
-    .movie-actions button.watch-new-tab {
-      background-color: #ffc107;
-      color: #000;
-    }
-    .movie-actions button:hover {
-      opacity: 0.9;
-    }
-    /* Modal Styles */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      position: relative;
       max-width: 800px;
-      width: 90%;
-      background: #fff;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .modal-header {
-      background: #007bff;
-      color: #fff;
-      padding: 15px;
-      text-align: center;
-    }
-    .modal-body {
-      padding: 20px;
-    }
-    .modal-close {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #fff;
-      color: #000;
+      height: 450px;
       border: none;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-      font-size: 16px;
-      line-height: 30px;
-      text-align: center;
     }
-    .modal-close:hover {
-      background: #ccc;
+    .video-list {
+      list-style: none;
+      padding: 0;
+    }
+    .video-list li {
+      margin: 10px 0;
+      cursor: pointer;
+      color: blue;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <h1>Lista de Películas</h1>
-  <div class="movie-container" id="movieContainer"></div>
-
-  <!-- Modal -->
-  <div class="modal" id="videoModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <span id="modalTitle">Título de la Película</span>
-        <button class="modal-close" onclick="closeModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <iframe id="modalVideoFrame" width="100%" height="450px" allowfullscreen></iframe>
-      </div>
-    </div>
+  <ul class="video-list" id="videoList"></ul>
+  <div class="video-container">
+    <iframe id="videoFrame" src="" allowfullscreen></iframe>
   </div>
 
   <script>
-    // URL del archivo JSON (puedes usar Dropbox, Google Drive o Terabox)
-    const jsonUrl = "movies.json"; // Cambia esto por tu URL
-
-    // Función para cargar los datos desde el archivo JSON
+    // Cargar datos desde el archivo JSON
     async function loadMovies() {
       try {
-        const response = await fetch(jsonUrl);
-        const movies = await response.json();
-        displayMovies(movies);
+        const response = await fetch('movies.json'); // Cargar el archivo JSON
+        const movies = await response.json(); // Convertir la respuesta a JSON
+
+        const videoList = document.getElementById("videoList");
+        const videoFrame = document.getElementById("videoFrame");
+
+        movies.forEach(movie => {
+          const listItem = document.createElement("li");
+          listItem.textContent = movie.title;
+
+          // Abrir el enlace de Terabox en el iframe
+          listItem.onclick = () => {
+            videoFrame.src = movie.url;
+          };
+
+          videoList.appendChild(listItem);
+        });
       } catch (error) {
-        console.error("Error al cargar las películas:", error);
+        console.error('Error al cargar las películas:', error);
       }
     }
 
-    // Función para mostrar las películas en la página
-    function displayMovies(movies) {
-      const movieContainer = document.getElementById("movieContainer");
-      movieContainer.innerHTML = ""; // Limpiar el contenedor
-
-      movies.forEach((movie) => {
-        const card = document.createElement("div");
-        card.className = "movie-card";
-
-        card.innerHTML = `
-          <img src="${movie.poster}" alt="${movie.title}">
-          <div class="movie-info">
-            <div class="movie-title">${movie.title}</div>
-            <div class="movie-details">
-              <p><strong>Sinopsis:</strong> ${movie.synopsis}</p>
-              <p><strong>Fecha de Estreno:</strong> ${movie.releaseDate}</p>
-              <p><strong>Género:</strong> ${movie.genre}</p>
-              <p><strong>Duración:</strong> ${movie.duration} minutos</p>
-            </div>
-            <div class="movie-actions">
-              <button class="watch-iframe" onclick="watchInIframe('${movie.url}')">Ver en Iframe</button>
-              <button class="watch-modal" onclick="watchInModal('${movie.url}', '${movie.title}')">Ver en Modal</button>
-              <button class="watch-new-tab" onclick="watchInNewTab('${movie.url}')">Ver en Nueva Pestaña</button>
-            </div>
-          </div>
-        `;
-
-        movieContainer.appendChild(card);
-      });
-    }
-
-    // Función para ver el video en un iframe
-    function watchInIframe(url) {
-      const videoFrame = document.getElementById("videoFrame");
-      videoFrame.src = url;
-    }
-
-    // Función para ver el video en una ventana modal
-    function watchInModal(url, title) {
-      const modal = document.getElementById("videoModal");
-      const modalVideoFrame = document.getElementById("modalVideoFrame");
-      const modalTitle = document.getElementById("modalTitle");
-
-      modalTitle.textContent = title;
-      modalVideoFrame.src = url;
-      modal.style.display = "flex";
-    }
-
-    // Función para cerrar la ventana modal
-    function closeModal() {
-      const modal = document.getElementById("videoModal");
-      const modalVideoFrame = document.getElementById("modalVideoFrame");
-
-      modal.style.display = "none";
-      modalVideoFrame.src = ""; // Detener el video
-    }
-
-    // Función para ver el video en una nueva pestaña
-    function watchInNewTab(url) {
-      window.open(url, "_blank");
-    }
-
-    // Cargar las películas al cargar la página
+    // Llamar a la función para cargar las películas cuando se carga la página
     document.addEventListener("DOMContentLoaded", loadMovies);
   </script>
 </body>
