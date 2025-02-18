@@ -1,9 +1,0 @@
-# Ignorar archivos temporales
-*.log
-*.tmp
-
-# Ignorar dependencias de Node.js (si aplica)
-node_modules/
-
-# Ignorar archivos sensibles
-.env
