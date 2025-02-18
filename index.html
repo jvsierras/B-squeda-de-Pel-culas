@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diversion en Linea</title>
+  <title>Mi Películas Online</title>
   <style>
     /* Estilos generales */
     body {
@@ -114,100 +114,86 @@
   </div>
 
   <script>
-    // Simulación de datos protegidos (en un entorno real, obtén esto desde un backend)
-    const movies = [
-      {
-        title: "The Marvels (2023)",
-        poster: "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/vpuuFM032yiX8tox4L84Wl9MGjG.jpg",
-        description: "Una emocionante aventura de superhéroes.",
-        year: 2023,
-        genre: "Acción/Aventura",
-        options: [
-          { label: "Opción 1", url: "https://short.icu/JjhXT9b-n" },
-          { label: "Opción 2", url: "https://vidsrc.me/embed/movie?tmdb=609681" }
-        ]
-      },
-      {
-        title: "El Exorcista Creyentes (2023)",
-        poster: "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/6StdSKn9ej4rwtQjcl1XMk5E0iE.jpg",
-        description: "Un clásico del terror renovado. Cuando sus dos hijas son poseídas por un espíritu demoníaco, un padre desesperado busca la ayuda de Chris MacNeil, cuya hija Regan sobrevivió a una posesión similar en la década de 1970.",
-        year: 2023,
-        genre: "Terror",
-        options: [
-          { label: "Opción 1", url: "https://short.icu/GZg9k7T4i" },
-          { label: "Opción 2", url: "https://vidsrc.me/embed/movie?tmdb=807172" }
-        ]
-      }
-    ];
+    // Función para cargar datos desde el archivo JSON
+    async function loadMovies() {
+      try {
+        const response = await fetch('movies.json'); // Cargar el archivo JSON
+        const movies = await response.json(); // Convertir la respuesta a JSON
 
-    // Mostrar la lista de películas
-    const movieGrid = document.getElementById("movieGrid");
-    const videoModal = document.getElementById("videoModal");
-    const videoFrame = document.getElementById("videoFrame");
-    const closeModal = document.querySelector(".close-modal");
+        const movieGrid = document.getElementById("movieGrid");
+        const videoModal = document.getElementById("videoModal");
+        const videoFrame = document.getElementById("videoFrame");
+        const closeModal = document.querySelector(".close-modal");
 
-    movies.forEach(movie => {
-      const movieItem = document.createElement("div");
-      movieItem.classList.add("movie-item");
+        movies.forEach(movie => {
+          const movieItem = document.createElement("div");
+          movieItem.classList.add("movie-item");
 
-      const img = document.createElement("img");
-      img.src = movie.poster;
-      img.alt = movie.title;
+          const img = document.createElement("img");
+          img.src = movie.poster;
+          img.alt = movie.title;
 
-      const info = document.createElement("div");
-      info.classList.add("movie-info");
+          const info = document.createElement("div");
+          info.classList.add("movie-info");
 
-      const title = document.createElement("h3");
-      title.textContent = movie.title;
+          const title = document.createElement("h3");
+          title.textContent = movie.title;
 
-      const description = document.createElement("p");
-      description.textContent = movie.description;
+          const description = document.createElement("p");
+          description.textContent = movie.description;
 
-      const yearGenre = document.createElement("p");
-      yearGenre.textContent = `${movie.year} | ${movie.genre}`;
+          const yearGenre = document.createElement("p");
+          yearGenre.textContent = `${movie.year} | ${movie.genre}`;
 
-      const options = document.createElement("div");
+          const options = document.createElement("div");
 
-      movie.options.forEach(option => {
-        const link = document.createElement("a");
-        link.textContent = option.label;
-        link.href = "#";
-        link.onclick = (e) => {
-          e.preventDefault();
-          openVideoModal(option.url);
+          movie.options.forEach(option => {
+            const link = document.createElement("a");
+            link.textContent = option.label;
+            link.href = "#";
+            link.onclick = (e) => {
+              e.preventDefault();
+              openVideoModal(option.url);
+            };
+            options.appendChild(link);
+          });
+
+          info.appendChild(title);
+          info.appendChild(description);
+          info.appendChild(yearGenre);
+          info.appendChild(options);
+
+          movieItem.appendChild(img);
+          movieItem.appendChild(info);
+          movieGrid.appendChild(movieItem);
+        });
+
+        // Abrir el modal con el video seleccionado
+        function openVideoModal(url) {
+          videoFrame.src = url;
+          videoModal.style.display = "block";
+        }
+
+        // Cerrar el modal
+        closeModal.onclick = () => {
+          videoModal.style.display = "none";
+          videoFrame.src = "";
         };
-        options.appendChild(link);
-      });
 
-      info.appendChild(title);
-      info.appendChild(description);
-      info.appendChild(yearGenre);
-      info.appendChild(options);
-
-      movieItem.appendChild(img);
-      movieItem.appendChild(info);
-      movieGrid.appendChild(movieItem);
-    });
-
-    // Abrir el modal con el video seleccionado
-    function openVideoModal(url) {
-      videoFrame.src = url;
-      videoModal.style.display = "block";
+        // Cerrar el modal al hacer clic fuera del contenido
+        window.onclick = (event) => {
+          if (event.target === videoModal) {
+            videoModal.style.display = "none";
+            videoFrame.src = "";
+          }
+        };
+      } catch (error) {
+        console.error('Error al cargar las películas:', error);
+      }
     }
 
-    // Cerrar el modal
-    closeModal.onclick = () => {
-      videoModal.style.display = "none";
-      videoFrame.src = "";
-    };
-
-    // Cerrar el modal al hacer clic fuera del contenido
-    window.onclick = (event) => {
-      if (event.target === videoModal) {
-        videoModal.style.display = "none";
-        videoFrame.src = "";
-      }
-    };
+    // Llamar a la función para cargar las películas cuando se carga la página
+    document.addEventListener("DOMContentLoaded", loadMovies);
   </script>
 </body>
 </html>
