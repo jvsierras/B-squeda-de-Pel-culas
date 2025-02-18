@@ -5,7 +5,113 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Catálogo de Películas</title>
   <style>
-    /* Estilos anteriores (sin cambios) */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #141414;
+      color: white;
+    }
+    h1 {
+      text-align: center;
+      padding: 20px;
+      background-color: #000;
+      margin: 0;
+    }
+    .search-container {
+      text-align: center;
+      padding: 20px;
+    }
+    .search-container input {
+      padding: 10px;
+      width: 80%;
+      max-width: 400px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .movie-card {
+      background-color: #333;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .movie-card:hover {
+      transform: scale(1.05);
+    }
+    .movie-card img {
+      width: 100%;
+      height: 300px; /* Altura fija para los posters */
+      object-fit: cover; /* Ajustar la imagen sin distorsionar */
+    }
+    .movie-info {
+      padding: 10px;
+    }
+    .movie-info h3 {
+      margin: 0;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .movie-info p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+    .play-button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #e50914;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      text-align: center;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal iframe {
+      width: 90%;
+      height: 80%;
+      max-width: 800px;
+      border: none;
+      border-radius: 10px;
+    }
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      .movie-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+      .modal iframe {
+        height: 60%;
+      }
+    }
   </style>
 </head>
 <body>
