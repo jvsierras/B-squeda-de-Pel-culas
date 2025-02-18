@@ -3,59 +3,109 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lista de Películas</title>
+  <title>Catálogo de Películas</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    .video-container {
-      margin-bottom: 20px;
-    }
-    iframe {
-      width: 100%;
-      max-width: 800px;
-      height: 450px;
-      border: none;
-    }
-    .video-list {
-      list-style: none;
+      margin: 0;
       padding: 0;
+      background-color: #141414;
+      color: white;
     }
-    .video-list li {
-      margin: 10px 0;
+    h1 {
+      text-align: center;
+      padding: 20px;
+      background-color: #000;
+      margin: 0;
+    }
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .movie-card {
+      background-color: #333;
+      border-radius: 10px;
+      overflow: hidden;
       cursor: pointer;
-      color: blue;
-      text-decoration: underline;
+      transition: transform 0.3s ease;
     }
-    .loading {
-      color: gray;
-      font-style: italic;
+    .movie-card:hover {
+      transform: scale(1.05);
     }
-    .error {
-      color: red;
-      font-weight: bold;
+    .movie-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    .movie-info {
+      padding: 10px;
+    }
+    .movie-info h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+    .movie-info p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal iframe {
+      width: 90%;
+      height: 80%;
+      max-width: 800px;
+      border: none;
+      border-radius: 10px;
+    }
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      .movie-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+      .modal iframe {
+        height: 60%;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Lista de Películas</h1>
-  <ul class="video-list" id="videoList">
-    <li class="loading">Cargando películas...</li>
-  </ul>
-  <div class="video-container">
+  <h1>Catálogo de Películas</h1>
+  <div class="movie-grid" id="movieGrid">
+    <div class="loading">Cargando películas...</div>
+  </div>
+
+  <!-- Modal para reproducir el video -->
+  <div class="modal" id="videoModal">
+    <span class="close-btn" id="closeBtn">&times;</span>
     <iframe id="videoFrame" src="" allowfullscreen></iframe>
   </div>
+
   <script>
-    // Cargar datos desde el archivo JSON
+    // Función para cargar las películas desde un archivo JSON
     async function loadMovies() {
-      const videoList = document.getElementById("videoList");
-      const videoFrame = document.getElementById("videoFrame");
+      const movieGrid = document.getElementById("movieGrid");
 
       try {
-        // Limpiar el mensaje de carga
-        videoList.innerHTML = "";
-
         // Cargar el archivo JSON
         const response = await fetch('movies.json');
         if (!response.ok) {
@@ -69,25 +119,64 @@
           throw new Error("El archivo JSON está vacío o no contiene una lista válida de películas.");
         }
 
-        // Mostrar las películas en la lista
+        // Limpiar el mensaje de carga
+        movieGrid.innerHTML = "";
+
+        // Mostrar las películas en la cuadrícula
         movies.forEach(movie => {
-          const listItem = document.createElement("li");
-          listItem.textContent = movie.title;
+          const movieCard = document.createElement("div");
+          movieCard.classList.add("movie-card");
 
-          // Abrir el enlace de Terabox en el iframe
-          listItem.onclick = () => {
+          const poster = document.createElement("img");
+          poster.src = movie.poster;
+          poster.alt = movie.title;
+
+          const info = document.createElement("div");
+          info.classList.add("movie-info");
+
+          const title = document.createElement("h3");
+          title.textContent = movie.title;
+
+          const year = document.createElement("p");
+          year.textContent = `Año: ${movie.year}`;
+
+          const description = document.createElement("p");
+          description.textContent = movie.description;
+
+          info.appendChild(title);
+          info.appendChild(year);
+          info.appendChild(description);
+
+          movieCard.appendChild(poster);
+          movieCard.appendChild(info);
+
+          // Abrir el modal al hacer clic en la tarjeta
+          movieCard.addEventListener("click", () => {
+            const videoModal = document.getElementById("videoModal");
+            const videoFrame = document.getElementById("videoFrame");
             videoFrame.src = movie.url;
-          };
+            videoModal.style.display = "flex";
+          });
 
-          videoList.appendChild(listItem);
+          movieGrid.appendChild(movieCard);
         });
       } catch (error) {
         // Mostrar un mensaje de error en caso de problemas
-        videoList.innerHTML = `<li class="error">Error: ${error.message}</li>`;
+        movieGrid.innerHTML = `<div class="error">Error: ${error.message}</div>`;
       }
     }
 
-    // Llamar a la función para cargar las películas cuando se carga la página
+    // Cerrar el modal
+    const closeBtn = document.getElementById("closeBtn");
+    const videoModal = document.getElementById("videoModal");
+
+    closeBtn.addEventListener("click", () => {
+      const videoFrame = document.getElementById("videoFrame");
+      videoFrame.src = ""; // Detener el video
+      videoModal.style.display = "none";
+    });
+
+    // Cargar las películas al iniciar la página
     document.addEventListener("DOMContentLoaded", loadMovies);
   </script>
 </body>
