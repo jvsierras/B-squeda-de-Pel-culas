@@ -134,11 +134,22 @@
     }
 
     // Obtener películas populares desde la API de TMDb
-    async function fetchMovies(apiKey, language) {
+    async function fetchPopularMovies(apiKey, language) {
       const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=${language}`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`Error al cargar las películas: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json();
+      return data.results;
+    }
+
+    // Buscar películas por título en la API de TMDb
+    async function searchMovies(apiKey, query, language) {
+      const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query)}&language=${language}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Error al buscar películas: ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
       return data.results;
@@ -160,12 +171,17 @@
       const movieGrid = document.getElementById("movieGrid");
       movieGrid.innerHTML = ""; // Limpiar el mensaje de carga
 
+      if (movies.length === 0) {
+        movieGrid.innerHTML = `<div class="error">No se encontraron películas.</div>`;
+        return;
+      }
+
       movies.forEach(movie => {
         const movieCard = document.createElement("div");
         movieCard.classList.add("movie-card");
 
         const poster = document.createElement("img");
-        poster.src = `${posterBaseUrl}${movie.poster_path}`;
+        poster.src = movie.poster_path ? `${posterBaseUrl}${movie.poster_path}` : "https://via.placeholder.com/300x450";
         poster.alt = movie.title;
 
         const info = document.createElement("div");
@@ -175,10 +191,10 @@
         title.textContent = movie.title;
 
         const year = document.createElement("p");
-        year.textContent = `Año: ${movie.release_date.split("-")[0]}`;
+        year.textContent = `Año: ${movie.release_date ? movie.release_date.split("-")[0] : "Desconocido"}`;
 
         const description = document.createElement("p");
-        description.textContent = movie.overview;
+        description.textContent = movie.overview || "Sin descripción disponible.";
 
         const playButton = document.createElement("button");
         playButton.classList.add("play-button");
@@ -238,24 +254,28 @@
     const searchInput = document.getElementById("searchInput");
     let allMovies = []; // Almacenar todas las películas
 
-    searchInput.addEventListener("input", () => {
-      const searchTerm = searchInput.value.toLowerCase();
+    searchInput.addEventListener("input", async () => {
+      const searchTerm = searchInput.value.trim();
       if (searchTerm === "") {
-        displayMovies(allMovies, config.posterBaseUrl); // Mostrar todas las películas
+        // Si el campo de búsqueda está vacío, mostrar películas populares
+        displayMovies(allMovies, config.posterBaseUrl);
       } else {
-        const filteredMovies = allMovies.filter(movie =>
-          movie.title.toLowerCase().includes(searchTerm)
-        );
-        displayMovies(filteredMovies, config.posterBaseUrl);
+        // Buscar películas en TMDb
+        try {
+          const searchResults = await searchMovies(config.apiKey, searchTerm, config.language);
+          displayMovies(searchResults, config.posterBaseUrl);
+        } catch (error) {
+          console.error("Error al buscar películas:", error);
+        }
       }
     });
 
-    // Cargar las películas al iniciar la página
+    // Cargar las películas populares al iniciar la página
     let config;
     document.addEventListener("DOMContentLoaded", async () => {
       try {
         config = await loadConfig();
-        allMovies = await fetchMovies(config.apiKey, config.language);
+        allMovies = await fetchPopularMovies(config.apiKey, config.language);
         displayMovies(allMovies, config.posterBaseUrl);
       } catch (error) {
         const movieGrid = document.getElementById("movieGrid");
