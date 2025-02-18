@@ -28,25 +28,48 @@
       color: blue;
       text-decoration: underline;
     }
+    .loading {
+      color: gray;
+      font-style: italic;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
   <h1>Lista de Películas</h1>
-  <ul class="video-list" id="videoList"></ul>
+  <ul class="video-list" id="videoList">
+    <li class="loading">Cargando películas...</li>
+  </ul>
   <div class="video-container">
     <iframe id="videoFrame" src="" allowfullscreen></iframe>
   </div>
-
   <script>
     // Cargar datos desde el archivo JSON
     async function loadMovies() {
+      const videoList = document.getElementById("videoList");
+      const videoFrame = document.getElementById("videoFrame");
+
       try {
-        const response = await fetch('movies.json'); // Cargar el archivo JSON
-        const movies = await response.json(); // Convertir la respuesta a JSON
+        // Limpiar el mensaje de carga
+        videoList.innerHTML = "";
 
-        const videoList = document.getElementById("videoList");
-        const videoFrame = document.getElementById("videoFrame");
+        // Cargar el archivo JSON
+        const response = await fetch('movies.json');
+        if (!response.ok) {
+          throw new Error(`Error al cargar el archivo JSON: ${response.status} ${response.statusText}`);
+        }
 
+        const movies = await response.json();
+
+        // Verificar si el archivo JSON tiene datos
+        if (!Array.isArray(movies) || movies.length === 0) {
+          throw new Error("El archivo JSON está vacío o no contiene una lista válida de películas.");
+        }
+
+        // Mostrar las películas en la lista
         movies.forEach(movie => {
           const listItem = document.createElement("li");
           listItem.textContent = movie.title;
@@ -59,7 +82,8 @@
           videoList.appendChild(listItem);
         });
       } catch (error) {
-        console.error('Error al cargar las películas:', error);
+        // Mostrar un mensaje de error en caso de problemas
+        videoList.innerHTML = `<li class="error">Error: ${error.message}</li>`;
       }
     }
 
