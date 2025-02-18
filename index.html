@@ -18,6 +18,18 @@
       background-color: #000;
       margin: 0;
     }
+    .search-container {
+      text-align: center;
+      padding: 20px;
+    }
+    .search-container input {
+      padding: 10px;
+      width: 80%;
+      max-width: 400px;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+    }
     .movie-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -50,6 +62,17 @@
       margin: 5px 0;
       font-size: 14px;
       color: #ccc;
+    }
+    .play-button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #e50914;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      text-align: center;
     }
     .modal {
       display: none;
@@ -90,6 +113,9 @@
 </head>
 <body>
   <h1>Catálogo de Películas</h1>
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Buscar películas...">
+  </div>
   <div class="movie-grid" id="movieGrid">
     <div class="loading">Cargando películas...</div>
   </div>
@@ -113,6 +139,17 @@
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`Error al cargar las películas: ${response.status} ${response.statusText}`);
+      }
+      const data = await response.json();
+      return data.results;
+    }
+
+    // Obtener videos de una película desde la API de TMDb
+    async function fetchMovieVideos(movieId, apiKey, language) {
+      const url = `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${apiKey}&language=${language}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Error al cargar los videos: ${response.status} ${response.statusText}`);
       }
       const data = await response.json();
       return data.results;
@@ -143,23 +180,48 @@
         const description = document.createElement("p");
         description.textContent = movie.overview;
 
+        const playButton = document.createElement("button");
+        playButton.classList.add("play-button");
+        playButton.textContent = "Reproducir";
+
+        // Abrir el modal al hacer clic en el botón de reproducción
+        playButton.addEventListener("click", async (event) => {
+          event.stopPropagation(); // Evitar que el clic se propague a la tarjeta
+          try {
+            const videos = await fetchMovieVideos(movie.id, config.apiKey, config.language);
+            if (videos.length > 0) {
+              const trailer = videos.find(video => video.type === "Trailer" && video.site === "YouTube");
+              if (trailer) {
+                playVideo(trailer.key);
+              } else {
+                alert("No se encontró un tráiler disponible.");
+              }
+            } else {
+              alert("No hay videos disponibles para esta película.");
+            }
+          } catch (error) {
+            console.error("Error al cargar los videos:", error);
+          }
+        });
+
         info.appendChild(title);
         info.appendChild(year);
         info.appendChild(description);
+        info.appendChild(playButton);
 
         movieCard.appendChild(poster);
         movieCard.appendChild(info);
 
-        // Abrir el modal al hacer clic en la tarjeta
-        movieCard.addEventListener("click", () => {
-          const videoModal = document.getElementById("videoModal");
-          const videoFrame = document.getElementById("videoFrame");
-          videoFrame.src = `https://www.youtube.com/embed/${movie.video_key}`; // Ajusta esto según tu API
-          videoModal.style.display = "flex";
-        });
-
         movieGrid.appendChild(movieCard);
       });
+    }
+
+    // Reproducir el video en el modal
+    function playVideo(videoKey) {
+      const videoModal = document.getElementById("videoModal");
+      const videoFrame = document.getElementById("videoFrame");
+      videoFrame.src = `https://www.youtube.com/embed/${videoKey}`;
+      videoModal.style.display = "flex";
     }
 
     // Cerrar el modal
@@ -172,12 +234,29 @@
       videoModal.style.display = "none";
     });
 
+    // Búsqueda de películas
+    const searchInput = document.getElementById("searchInput");
+    let allMovies = []; // Almacenar todas las películas
+
+    searchInput.addEventListener("input", () => {
+      const searchTerm = searchInput.value.toLowerCase();
+      if (searchTerm === "") {
+        displayMovies(allMovies, config.posterBaseUrl); // Mostrar todas las películas
+      } else {
+        const filteredMovies = allMovies.filter(movie =>
+          movie.title.toLowerCase().includes(searchTerm)
+        );
+        displayMovies(filteredMovies, config.posterBaseUrl);
+      }
+    });
+
     // Cargar las películas al iniciar la página
+    let config;
     document.addEventListener("DOMContentLoaded", async () => {
       try {
-        const config = await loadConfig();
-        const movies = await fetchMovies(config.apiKey, config.language);
-        displayMovies(movies, config.posterBaseUrl);
+        config = await loadConfig();
+        allMovies = await fetchMovies(config.apiKey, config.language);
+        displayMovies(allMovies, config.posterBaseUrl);
       } catch (error) {
         const movieGrid = document.getElementById("movieGrid");
         movieGrid.innerHTML = `<div class="error">Error: ${error.message}</div>`;
