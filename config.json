@@ -1,0 +1,5 @@
+{
+  "apiKey": "TU_API_KEY_DE_TMDB",
+  "language": "es-ES",
+  "posterBaseUrl": "https://image.tmdb.org/t/p/w600_and_h900_bestv2"
+}
