@@ -101,69 +101,65 @@
   </div>
 
   <script>
-    // Función para cargar las películas desde un archivo JSON
-    async function loadMovies() {
-      const movieGrid = document.getElementById("movieGrid");
+    // Cargar la configuración desde el archivo config.json
+    async function loadConfig() {
+      const response = await fetch('config.json');
+      return await response.json();
+    }
 
-      try {
-        // Cargar el archivo JSON
-        const response = await fetch('movies.json');
-        if (!response.ok) {
-          throw new Error(`Error al cargar el archivo JSON: ${response.status} ${response.statusText}`);
-        }
-
-        const movies = await response.json();
-
-        // Verificar si el archivo JSON tiene datos
-        if (!Array.isArray(movies) || movies.length === 0) {
-          throw new Error("El archivo JSON está vacío o no contiene una lista válida de películas.");
-        }
-
-        // Limpiar el mensaje de carga
-        movieGrid.innerHTML = "";
-
-        // Mostrar las películas en la cuadrícula
-        movies.forEach(movie => {
-          const movieCard = document.createElement("div");
-          movieCard.classList.add("movie-card");
-
-          const poster = document.createElement("img");
-          poster.src = movie.poster;
-          poster.alt = movie.title;
-
-          const info = document.createElement("div");
-          info.classList.add("movie-info");
-
-          const title = document.createElement("h3");
-          title.textContent = movie.title;
-
-          const year = document.createElement("p");
-          year.textContent = `Año: ${movie.year}`;
-
-          const description = document.createElement("p");
-          description.textContent = movie.description;
-
-          info.appendChild(title);
-          info.appendChild(year);
-          info.appendChild(description);
-
-          movieCard.appendChild(poster);
-          movieCard.appendChild(info);
-
-          // Abrir el modal al hacer clic en la tarjeta
-          movieCard.addEventListener("click", () => {
-            const videoModal = document.getElementById("videoModal");
-            const videoFrame = document.getElementById("videoFrame");
-            videoFrame.src = movie.url;
-            videoModal.style.display = "flex";
-          });
-
-          movieGrid.appendChild(movieCard);
-        });
-      } catch (error) {
-        // Mostrar un mensaje de error en caso de problemas
-        movieGrid.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+    // Obtener películas populares desde la API de TMDb
+    async function fetchMovies(apiKey, language) {
+      const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&language=${language}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Error al cargar las películas: ${response.status} ${response.statusText}`);
       }
+      const data = await response.json();
+      return data.results;
+    }
+
+    // Mostrar las películas en la página
+    function displayMovies(movies, posterBaseUrl) {
+      const movieGrid = document.getElementById("movieGrid");
+      movieGrid.innerHTML = ""; // Limpiar el mensaje de carga
+
+      movies.forEach(movie => {
+        const movieCard = document.createElement("div");
+        movieCard.classList.add("movie-card");
+
+        const poster = document.createElement("img");
+        poster.src = `${posterBaseUrl}${movie.poster_path}`;
+        poster.alt = movie.title;
+
+        const info = document.createElement("div");
+        info.classList.add("movie-info");
+
+        const title = document.createElement("h3");
+        title.textContent = movie.title;
+
+        const year = document.createElement("p");
+        year.textContent = `Año: ${movie.release_date.split("-")[0]}`;
+
+        const description = document.createElement("p");
+        description.textContent = movie.overview;
+
+        info.appendChild(title);
+        info.appendChild(year);
+        info.appendChild(description);
+
+        movieCard.appendChild(poster);
+        movieCard.appendChild(info);
+
+        // Abrir el modal al hacer clic en la tarjeta
+        movieCard.addEventListener("click", () => {
+          const videoModal = document.getElementById("videoModal");
+          const videoFrame = document.getElementById("videoFrame");
+          videoFrame.src = `https://www.youtube.com/embed/${movie.video_key}`; // Ajusta esto según tu API
+          videoModal.style.display = "flex";
+        });
+
+        movieGrid.appendChild(movieCard);
+      });
     }
 
     // Cerrar el modal
@@ -177,7 +173,16 @@
     });
 
     // Cargar las películas al iniciar la página
-    document.addEventListener("DOMContentLoaded", loadMovies);
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const config = await loadConfig();
+        const movies = await fetchMovies(config.apiKey, config.language);
+        displayMovies(movies, config.posterBaseUrl);
+      } catch (error) {
+        const movieGrid = document.getElementById("movieGrid");
+        movieGrid.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+      }
+    });
   </script>
 </body>
 </html>
