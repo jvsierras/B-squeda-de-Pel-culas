@@ -1,18 +1,51 @@
 [
   {
     "title": "The Marvels (2023)",
+    "poster": "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/vpuuFM032yiX8tox4L84Wl9MGjG.jpg",
+    "description": "Cuando sus deberes llevan a Carol Danvers, alias Capitana Marvel, a un agujero de gusano anómalo vinculado a un revolucionario Kree, sus poderes se enredan con los de Ms. Marvel y con los de Monica Rambeau, la distanciada sobrina de Carol y astronauta de S.A.B.E.R. Juntas, deberán trabajar en sincronía para salvar al universo como "The Marvels".",
+    "year": 2023,
     "url": "https://short.icu/JjhXT9b-n"
   },
   {
     "title": "El Exorcista: Creyentes (2023)",
+    "poster": "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/6StdSKn9ej4rwtQjcl1XMk5E0iE.jpg",
+    "description": "Cuando sus dos hijas son poseídas por un espíritu demoníaco, un padre desesperado busca la ayuda de Chris MacNeil, cuya hija Regan sobrevivió a una posesión similar en la década de 1970.",
+    "year": 2023,
     "url": "https://short.icu/GZg9k7T4i"
   },
   {
     "title": "Cónclave (2024)",
+    "poster": "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/yRYYCYL9kYQOVEVtKbcyuEIa6EK.jpg",
+    "description": "Sigue la historia del cardenal Lawrence, un hombre que tiene la tarea de dirigir un proceso encubierto para la elección de un nuevo Papa.",
+    "year": 2024,
     "url": "https://short.icu/F4FjMB_vv"
   },
   {
     "title": "Kraven the Hunter (2024)",
+    "poster": "https://via.placeholder.com/300x450",
+    "description": "Descripción de la película 1.",
+    "year": 2021,
     "url": "https://short.icu/XdKaWzYnhp"
+  },
+  {
+    "title": "Película 1",
+    "poster": "https://via.placeholder.com/300x450",
+    "description": "Descripción de la película 1.",
+    "year": 2021,
+    "url": "https://www.youtube.com/embed/dQw4w9WgXcQ"
+  },
+  {
+    "title": "Película 2",
+    "poster": "https://via.placeholder.com/300x450",
+    "description": "Descripción de la película 2.",
+    "year": 2022,
+    "url": "https://www.youtube.com/embed/dQw4w9WgXcQ"
+  },
+  {
+    "title": "Película 3",
+    "poster": "https://via.placeholder.com/300x450",
+    "description": "Descripción de la película 3.",
+    "year": 2023,
+    "url": "https://www.youtube.com/embed/dQw4w9WgXcQ"
   }
 ]
